@@ -3,7 +3,6 @@ package com.atait.exercises.mapper;
 
 import com.atait.exercises.mapper.decorator.JobSurveyDecorator;
 import com.atait.exercises.model.dto.JobSurveyDTO;
-import com.atait.exercises.model.response.JobDataResponse;
 import com.atait.exercises.model.response.JobResponse;
 import com.atait.exercises.model.source.SalarySurvey;
 import org.mapstruct.DecoratedWith;

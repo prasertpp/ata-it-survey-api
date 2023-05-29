@@ -1,27 +1,23 @@
 package com.atait.exercises.model.request;
 
+import jakarta.validation.constraints.Max;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.context.properties.bind.DefaultValue;
 
 import java.util.List;
 
 @Data
 @AllArgsConstructor
-@NoArgsConstructor
 public class SearchJobSurveyRequest {
 
-    private String salary;
+    private List<SalaryCondition> salaryConditions;
 
-    @Value("#{'${fields}'.split(',')}")
     private List<String> fields;
 
+    private int page;
 
-    private Integer page = 1;
-
-    private Integer pageSize = 10;
+    @Max(value = 1000, message = "page_size is limited at 1000")
+    private int pageSize;
 
 /*
 Timestamp

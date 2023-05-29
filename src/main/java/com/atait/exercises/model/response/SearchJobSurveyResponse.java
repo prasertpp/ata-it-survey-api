@@ -10,7 +10,7 @@ import java.util.List;
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class JobDataResponse {
+public class SearchJobSurveyResponse {
     private List<JobResponse> jobs;
     private Long totalItems;
     private Integer totalPages;

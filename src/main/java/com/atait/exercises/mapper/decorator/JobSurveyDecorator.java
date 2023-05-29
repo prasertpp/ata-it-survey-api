@@ -6,7 +6,7 @@ import com.atait.exercises.mapper.JobSurveyDTOMapper;
 import com.atait.exercises.model.dto.JobSurveyDTO;
 import com.atait.exercises.model.response.JobResponse;
 import com.atait.exercises.model.source.SalarySurvey;
-import org.apache.commons.text.CaseUtils;
+import com.google.common.base.CaseFormat;
 import org.springframework.util.CollectionUtils;
 
 import java.util.Arrays;
@@ -35,9 +35,10 @@ public abstract  class JobSurveyDecorator implements JobSurveyDTOMapper {
     public JobResponse dtoToJobResponse(JobSurveyDTO dto, List<String> displayFields){
           JobResponse jobResponse = mapper.dtoToJobResponse(dto,displayFields);
         if(!CollectionUtils.isEmpty(displayFields)) {
+
             Arrays.stream(JobResponse.class.getDeclaredFields())
                     .filter(field -> {
-                        var displayFieldInCamel = displayFields.stream().map(displayField -> CaseUtils.toCamelCase(displayField, false, '_'));
+                        var displayFieldInCamel = displayFields.stream().map(displayField -> CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.LOWER_CAMEL,displayField));
                         return !displayFieldInCamel.anyMatch(x -> field.getName().equals(x));
                     })
                     .forEach(field -> {

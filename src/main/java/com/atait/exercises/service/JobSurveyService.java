@@ -4,7 +4,7 @@ import com.atait.exercises.exception.SourceDataMapperException;
 import com.atait.exercises.mapper.JobSurveyDTOMapper;
 import com.atait.exercises.model.dto.JobSurveyDTO;
 import com.atait.exercises.model.request.SearchJobSurveyRequest;
-import com.atait.exercises.model.response.JobDataResponse;
+import com.atait.exercises.model.response.SearchJobSurveyResponse;
 import com.atait.exercises.model.source.SalarySurvey;
 import com.atait.exercises.repository.JobSurveyRepository;
 import com.atait.exercises.repository.JobSurveySpecification;
@@ -37,15 +37,15 @@ public class JobSurveyService {
     @Autowired
     private JobSurveySpecification jobSurveySpecification;
 
-    public JobDataResponse searchingJobDataResponse(SearchJobSurveyRequest request){
+    public SearchJobSurveyResponse searchingJobDataResponse(SearchJobSurveyRequest request){
 
 
         Sort sorting =  Sort.by("created").descending(); //fixme fix here to allow from request
         Pageable p = PageRequest.of(Math.max(request.getPage()-1,0) ,Math.max(request.getPageSize(),10),sorting);
 
-        var result = jobSurveyRepository.findAll(jobSurveySpecification.salary(),p);
+        var result = jobSurveyRepository.findAll(jobSurveySpecification.salary(request.getSalaryConditions()),p);
 
-        JobDataResponse response = new JobDataResponse();
+        SearchJobSurveyResponse response = new SearchJobSurveyResponse();
         response.setJobs(result.stream().map(dto -> JobSurveyDTOMapper.INSTANCE.dtoToJobResponse(dto,request.getFields())).collect(Collectors.toList()));
         response.setPage(result.getNumber()+1);
         response.setPageSize(result.getNumberOfElements());
