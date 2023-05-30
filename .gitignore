@@ -1,10 +1,14 @@
 # Compiled class file
 *.class
-*.idea
+*.idea/
+*.iml
+
 # Log file
 *.log
 
-*.iml
+
+
+
 
 # BlueJ files
 *.ctxt

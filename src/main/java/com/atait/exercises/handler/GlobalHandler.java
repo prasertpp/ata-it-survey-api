@@ -37,8 +37,8 @@ public class GlobalHandler {
                 Arrays.asList(e.getMessage()):
                 e.getErrors();
 
-        Status status = new Status(StatusCode.INTERNAL_SERVER_ERROR,
-                HttpStatus.INTERNAL_SERVER_ERROR.toString(),
+        Status status = new Status(StatusCode.BAD_REQUEST,
+                "invalid parameter",
                 errors);
         response.setStatus(status);
 

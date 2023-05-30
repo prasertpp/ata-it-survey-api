@@ -2,7 +2,7 @@ package com.atait.exercises.mapper;
 
 
 import com.atait.exercises.mapper.decorator.JobSurveyDecorator;
-import com.atait.exercises.model.dto.JobSurveyDTO;
+import com.atait.exercises.model.entity.JobSurveyEntity;
 import com.atait.exercises.model.response.JobResponse;
 import com.atait.exercises.model.source.SalarySurvey;
 import org.mapstruct.DecoratedWith;
@@ -29,15 +29,17 @@ public interface JobSurveyDTOMapper {
     @Mapping(source = "annualStockValueBonus", target = "annualStockValueBonus")
     @Mapping(source = "gender", target = "gender")
     @Mapping(source = "additionalComments", target = "comments")
-    JobSurveyDTO surveyJsonToDTO(SalarySurvey survey);
+    JobSurveyEntity sourceJsonToDTO(SalarySurvey survey);
 
 
-    @Mapping(source = "dto.id" ,target = "jobId")
+    @Mapping(source = "dto.jobId" ,target = "jobId")
     @Mapping(source = "dto.companyName", target = "companyName")
     @Mapping(source = "dto.location", target = "location")
     @Mapping(source = "dto.jobTitle", target = "jobTitle")
     @Mapping(source = "dto.salary", target = "salary")
-    JobResponse dtoToJobResponse(JobSurveyDTO dto,List<String> fields);
+    @Mapping(source = "dto.created", target = "createdDate")
+    @Mapping(source = "dto.gender", target = "gender")
+    JobResponse dtoToJobResponse(JobSurveyEntity dto, List<String> fields);
 
 
 }

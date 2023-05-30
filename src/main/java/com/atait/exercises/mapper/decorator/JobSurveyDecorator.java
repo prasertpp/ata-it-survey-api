@@ -3,7 +3,7 @@ package com.atait.exercises.mapper.decorator;
 import com.atait.exercises.exception.IllegalDisplayFieldNameException;
 import com.atait.exercises.exception.SourceDataMapperException;
 import com.atait.exercises.mapper.JobSurveyDTOMapper;
-import com.atait.exercises.model.dto.JobSurveyDTO;
+import com.atait.exercises.model.entity.JobSurveyEntity;
 import com.atait.exercises.model.response.JobResponse;
 import com.atait.exercises.model.source.SalarySurvey;
 import com.google.common.base.CaseFormat;
@@ -20,9 +20,9 @@ public abstract  class JobSurveyDecorator implements JobSurveyDTOMapper {
     }
 
     @Override
-    public JobSurveyDTO surveyJsonToDTO(SalarySurvey survey){
+    public JobSurveyEntity sourceJsonToDTO(SalarySurvey survey){
         try {
-            JobSurveyDTO dto = mapper.surveyJsonToDTO(survey);
+            JobSurveyEntity dto = mapper.sourceJsonToDTO(survey);
 //FIXME do this?            dto.setSalaryCurrency("USD");
             return dto;
         }catch (Exception e){
@@ -32,7 +32,7 @@ public abstract  class JobSurveyDecorator implements JobSurveyDTOMapper {
     }
 
     @Override
-    public JobResponse dtoToJobResponse(JobSurveyDTO dto, List<String> displayFields){
+    public JobResponse dtoToJobResponse(JobSurveyEntity dto, List<String> displayFields){
           JobResponse jobResponse = mapper.dtoToJobResponse(dto,displayFields);
         if(!CollectionUtils.isEmpty(displayFields)) {
 

@@ -1,29 +1,29 @@
 package com.atait.exercises.controller;
 
+import com.atait.exercises.enums.OperatorEnum;
 import com.atait.exercises.enums.StatusCode;
 import com.atait.exercises.exception.ValidationException;
 import com.atait.exercises.model.request.SalaryCondition;
 import com.atait.exercises.model.request.SearchJobSurveyRequest;
+import com.atait.exercises.model.request.SortParamRequest;
 import com.atait.exercises.model.response.CommonResponse;
 import com.atait.exercises.model.response.JobResponse;
 import com.atait.exercises.model.response.SearchJobSurveyResponse;
 import com.atait.exercises.model.response.Status;
 import com.atait.exercises.service.JobSurveyService;
-import com.atait.exercises.utils.OperatorUtils;
+import com.atait.exercises.utils.DateUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
-
 import com.google.common.base.CaseFormat;
+import io.micrometer.common.util.StringUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolation;
-
 import jakarta.validation.Validator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-
 import org.springframework.util.CollectionUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -36,6 +36,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -56,18 +58,29 @@ public class JobDataController {
     @Autowired
     private Validator validator;
 
+
+    private static final String SALARY_QUERY_PARAM_PATTERN = "^salary\\[(.*)\\].*";
+
     @GetMapping(value = "/job_data", produces = "application/json")
     public ResponseEntity<CommonResponse<SearchJobSurveyResponse>> jobDataSearching(
             HttpServletRequest servletRequest,
+            @RequestParam(value = "start_date",required = false) String startDate,
+            @RequestParam(value = "end_date",required = false) String endDate,
+            @RequestParam(value = "job_title",required = false) String jobTitle,
+            @RequestParam(value = "gender",required = false) String gender,
             @RequestParam(value = "page_size", defaultValue = "10", required = false) Integer pageSize,
             @RequestParam(value = "page", defaultValue = "1", required = false) Integer page,
-            @RequestParam(value = "fields", required = false)
-            @Value("#{'${fields}'.split(',')}") List<String> fields
+            @RequestParam(value = "field", required = false)
+            @Value("#{'${field}'.split(',')}") List<String> fields,
+            @RequestParam(value = "sort", required = false) List<String> sorting,
+            @RequestParam(value = "sort_type", required = false) List<String> sortTypes
     ) {
 
         List<SalaryCondition> salaryConditions = getSalaryConditions(servletRequest);
+        List<SortParamRequest> sortParamRequests = getSortParamRequests(sorting, sortTypes);
 
-        SearchJobSurveyRequest request = new SearchJobSurveyRequest(salaryConditions,fields, page, pageSize);
+        SearchJobSurveyRequest request = new SearchJobSurveyRequest(salaryConditions,startDate,endDate,jobTitle,gender, fields, page, pageSize, sortParamRequests);
+
         validateJobDataSearchingValue(request);
         CommonResponse<SearchJobSurveyResponse> response = new CommonResponse<>();
         response.setStatus(new Status(StatusCode.SUCCESS, "success"));
@@ -75,30 +88,46 @@ public class JobDataController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    private List<SortParamRequest> getSortParamRequests(List<String> sortFields, List<String> sortTypes) {
+        List<SortParamRequest> sortParamRequests = new ArrayList<>();
+        if (sortFields.size() != sortFields.size()) {
+            throw new ValidationException("sort and sort_type are invalid format, the number of sort field and sort_type must match");
+        }
+        for (int i = 0; i < sortFields.size(); i++) {
+            Optional<Sort.Direction> sortType = Sort.Direction.fromOptionalString(sortTypes.get(i));
+            sortParamRequests.add(new SortParamRequest(sortFields.get(i), sortType));
+        }
+
+        return sortParamRequests;
+    }
+
     private List<SalaryCondition> getSalaryConditions(HttpServletRequest servletRequest) {
-        var allQueryParams  = servletRequest.getParameterMap();
+        Map<String,String[]> allQueryParams = servletRequest.getParameterMap();
         List<SalaryCondition> salaryConditions = new ArrayList<>();
         List<String> errorList = new ArrayList<>();
         Set<String> operatorsSet = new HashSet<>();
-        for(var entry : allQueryParams.entrySet()){
-            String salaryPattern ="^salary\\[(.*)\\].*";
-            Pattern pattern = Pattern.compile(salaryPattern);
+        for (var entry : allQueryParams.entrySet()) {
+            Pattern pattern = Pattern.compile(SALARY_QUERY_PARAM_PATTERN);
             Matcher matcher = pattern.matcher(entry.getKey());
-            if(matcher.matches()){
+            if (matcher.matches()) {
                 String operator = matcher.group(1);
-                String comparisonOperator = OperatorUtils.convertToComparisonOperator(operator);
-                if(!operatorsSet.contains(comparisonOperator)) {
+                if (!operatorsSet.contains(operator)) {
                     try {
-                        SalaryCondition salaryCondition = new SalaryCondition(new BigDecimal(entry.getValue()[0]), comparisonOperator);
+                        Optional<OperatorEnum> operatorEnum = OperatorEnum.of(operator);
+                        if(operatorEnum.isEmpty()){
+                            errorList.add("["+operator+ "] is invalid value, operators supports only [gt],[lt],[eq],[gte],[lte]");
+                            break;
+                        }
+                        SalaryCondition salaryCondition = new SalaryCondition(new BigDecimal(entry.getValue()[0]), operatorEnum.get());
                         salaryConditions.add(salaryCondition);
-                        operatorsSet.add(comparisonOperator);
+                        operatorsSet.add(operator);
                     } catch (NumberFormatException e) {
                         errorList.add(entry.getKey() + " is invalid value");
                     }
                 }
             }
         }
-        if(!CollectionUtils.isEmpty(errorList)){
+        if (!CollectionUtils.isEmpty(errorList)) {
             throw new ValidationException(errorList);
         }
 
@@ -123,25 +152,57 @@ public class JobDataController {
 
         List<String> errorList = new ArrayList<>();
         if (!violations.isEmpty()) {
-            List<String> constraintViolationErrors= violations.stream().map(violation -> violation.getMessage()).collect(Collectors.toList());
+            List<String> constraintViolationErrors = violations.stream().map(violation -> violation.getMessage()).collect(Collectors.toList());
             errorList.addAll(constraintViolationErrors);
         }
 
-//        validate fields
-        if (!CollectionUtils.isEmpty(request.getFields())) {
+//        validate field, sort
+        if (!CollectionUtils.isEmpty(request.getFields()) || !CollectionUtils.isEmpty(request.getSortParamRequests())) {
             var requestFields = Arrays.stream(JobResponse.class.getDeclaredFields())
                     .map(requestField -> CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, requestField.getName()))
                     .collect(Collectors.toList());
 
-            for (String field : request.getFields()) {
-                if (!requestFields.contains(field)) {
-                    errorList.add("fields support value only " +
-                            String.join(",", requestFields));
-                    break;
+//        validate fields
+            if (!CollectionUtils.isEmpty(request.getFields())) {
+                for (String field : request.getFields()) {
+                    if (!requestFields.contains(field)) {
+                        errorList.add("field support value only " +
+                                String.join(",", requestFields));
+                        break;
+                    }
                 }
             }
-        }
+//         validate date
+            if(StringUtils.isNotBlank(request.getStartDate()) && StringUtils.isNotBlank(request.getEndDate()) && DateUtils.isBefore(DateUtils.DMY_PATTERN,request.getEndDate(),request.getStartDate())){
+                errorList.add("start_date is after end_date");
+            }
+//         validate jobTitle
+//         validate sort
+            if (!CollectionUtils.isEmpty(request.getSortParamRequests())) {
+                for (SortParamRequest sortParamRequest : request.getSortParamRequests()) {
+                    boolean errorSortType = false;
+                    boolean errorSort = false;
+                    if (!sortParamRequest.getSortType().isPresent()) {
+                        errorList.add("sort_type support value only 'asc' or 'desc'");
+                        errorSortType = true;
+                    }
 
-        //validate salary
+                    if (!requestFields.contains(sortParamRequest.getSortField())) {
+                        errorList.add("sort support value only " +
+                                String.join(",", requestFields));
+                        errorSort = true;
+                    }
+
+                    if (errorSort && errorSortType) {
+                        break;
+                    }
+                }
+            }
+
+
+            if (!CollectionUtils.isEmpty(errorList)) {
+                throw new ValidationException(errorList);
+            }
+        }
     }
 }

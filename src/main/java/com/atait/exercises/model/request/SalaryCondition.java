@@ -1,8 +1,8 @@
 package com.atait.exercises.model.request;
 
-import lombok.Data;
+import com.atait.exercises.enums.OperatorEnum;
 
 import java.math.BigDecimal;
 
-public record SalaryCondition(BigDecimal value, String operator) {
+public record SalaryCondition(BigDecimal value, OperatorEnum operator) {
 }
