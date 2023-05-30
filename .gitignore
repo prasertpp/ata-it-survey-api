@@ -4,8 +4,9 @@
 *.iml
 
 # Log file
-*.log
-
+*.logs
+logs/*
+setup/pg-data/*
 
 
 

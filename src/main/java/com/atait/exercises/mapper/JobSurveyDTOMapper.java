@@ -18,17 +18,19 @@ import java.util.List;
 public interface JobSurveyDTOMapper {
     JobSurveyDTOMapper INSTANCE = Mappers.getMapper(JobSurveyDTOMapper.class);
 
-    @Mapping(source = "timestamp", target = "created", dateFormat = "dd/MM/yyyy")
-    @Mapping(source = "employer", target = "companyName")
-    @Mapping(source = "jobTitle", target = "jobTitle")
-    @Mapping(source = "yearsAtEmployer", target = "yearAtEmployer")
-    @Mapping(source = "yearsOfExperience", target = "totalYearExperience")
-    @Mapping(source = "salary", target = "salary")
-    @Mapping(source = "signingBonus", target = "signingBonus")
-    @Mapping(source = "annualBonus", target = "annualBonus")
-    @Mapping(source = "annualStockValueBonus", target = "annualStockValueBonus")
-    @Mapping(source = "gender", target = "gender")
-    @Mapping(source = "additionalComments", target = "comments")
+    @Mapping(source = "survey.timestamp", target = "created", dateFormat = "dd/MM/yyyy")
+    @Mapping(source = "survey.employer", target = "companyName")
+    @Mapping(source = "survey.jobTitle", target = "jobTitle")
+    @Mapping(source = "survey.yearsAtEmployer", target = "yearAtEmployer")
+    @Mapping(source = "survey.yearsOfExperience", target = "totalYearExperience")
+    @Mapping(source = "survey.salary", target = "salary")
+    @Mapping(source = "survey.signingBonus", target = "signingBonus")
+    @Mapping(source = "survey.annualBonus", target = "annualBonus")
+    @Mapping(source = "survey.annualStockValueBonus", target = "annualStockValueBonus")
+    @Mapping(source = "survey.gender", target = "gender")
+    @Mapping(source = "survey.additionalComments", target = "comments")
+    @Mapping(target = "jobId",ignore = true)
+    @Mapping(target = "salaryCurrency",ignore = true)
     JobSurveyEntity sourceJsonToDTO(SalarySurvey survey);
 
 
@@ -39,6 +41,7 @@ public interface JobSurveyDTOMapper {
     @Mapping(source = "dto.salary", target = "salary")
     @Mapping(source = "dto.created", target = "createdDate")
     @Mapping(source = "dto.gender", target = "gender")
+    @Mapping(source = "dto.salaryCurrency", target = "salaryCurrency")
     JobResponse dtoToJobResponse(JobSurveyEntity dto, List<String> fields);
 
 

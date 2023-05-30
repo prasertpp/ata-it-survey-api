@@ -18,6 +18,8 @@ import io.micrometer.common.util.StringUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Sort;
@@ -41,7 +43,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 
 @Controller
@@ -58,6 +59,7 @@ public class JobDataController {
     @Autowired
     private Validator validator;
 
+    final Logger logger = LoggerFactory.getLogger(JobDataController.class);
 
     private static final String SALARY_QUERY_PARAM_PATTERN = "^salary\\[(.*)\\].*";
 
@@ -75,22 +77,24 @@ public class JobDataController {
             @RequestParam(value = "sort", required = false) List<String> sorting,
             @RequestParam(value = "sort_type", required = false) List<String> sortTypes
     ) {
-
+        logger.info("[jobDataSearching] START");
         List<SalaryCondition> salaryConditions = getSalaryConditions(servletRequest);
         List<SortParamRequest> sortParamRequests = getSortParamRequests(sorting, sortTypes);
 
         SearchJobSurveyRequest request = new SearchJobSurveyRequest(salaryConditions,startDate,endDate,jobTitle,gender, fields, page, pageSize, sortParamRequests);
-
+        logger.info("[jobDataSearching] REQUEST : {}",request);
         validateJobDataSearchingValue(request);
         CommonResponse<SearchJobSurveyResponse> response = new CommonResponse<>();
         response.setStatus(new Status(StatusCode.SUCCESS, "success"));
         response.setData(jobSurveyService.searchingJobDataResponse(request));
+
+        logger.info("[jobDataSearching] DONE");
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     private List<SortParamRequest> getSortParamRequests(List<String> sortFields, List<String> sortTypes) {
         List<SortParamRequest> sortParamRequests = new ArrayList<>();
-        if (sortFields.size() != sortFields.size()) {
+        if (sortFields.size() != sortTypes.size()) {
             throw new ValidationException("sort and sort_type are invalid format, the number of sort field and sort_type must match");
         }
         for (int i = 0; i < sortFields.size(); i++) {
@@ -152,17 +156,30 @@ public class JobDataController {
 
         List<String> errorList = new ArrayList<>();
         if (!violations.isEmpty()) {
-            List<String> constraintViolationErrors = violations.stream().map(violation -> violation.getMessage()).collect(Collectors.toList());
+            List<String> constraintViolationErrors = violations.stream().map(ConstraintViolation::getMessage).toList();
             errorList.addAll(constraintViolationErrors);
         }
 
-//        validate field, sort
+            validateFieldAndSorting(request, errorList);
+//         validate date
+            if(StringUtils.isNotBlank(request.getStartDate()) && StringUtils.isNotBlank(request.getEndDate()) && DateUtils.isBefore(DateUtils.DMY_PATTERN,request.getEndDate(),request.getStartDate())){
+                errorList.add("start_date is after end_date");
+            }
+//         validate jobTitle
+
+
+            if (!CollectionUtils.isEmpty(errorList)) {
+                throw new ValidationException(errorList);
+            }
+
+    }
+
+    private void validateFieldAndSorting(SearchJobSurveyRequest request, List<String> errorList) {
         if (!CollectionUtils.isEmpty(request.getFields()) || !CollectionUtils.isEmpty(request.getSortParamRequests())) {
             var requestFields = Arrays.stream(JobResponse.class.getDeclaredFields())
                     .map(requestField -> CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, requestField.getName()))
-                    .collect(Collectors.toList());
+                    .toList();
 
-//        validate fields
             if (!CollectionUtils.isEmpty(request.getFields())) {
                 for (String field : request.getFields()) {
                     if (!requestFields.contains(field)) {
@@ -172,36 +189,20 @@ public class JobDataController {
                     }
                 }
             }
-//         validate date
-            if(StringUtils.isNotBlank(request.getStartDate()) && StringUtils.isNotBlank(request.getEndDate()) && DateUtils.isBefore(DateUtils.DMY_PATTERN,request.getEndDate(),request.getStartDate())){
-                errorList.add("start_date is after end_date");
-            }
-//         validate jobTitle
-//         validate sort
+
             if (!CollectionUtils.isEmpty(request.getSortParamRequests())) {
                 for (SortParamRequest sortParamRequest : request.getSortParamRequests()) {
-                    boolean errorSortType = false;
-                    boolean errorSort = false;
                     if (!sortParamRequest.getSortType().isPresent()) {
                         errorList.add("sort_type support value only 'asc' or 'desc'");
-                        errorSortType = true;
+                        break;
                     }
 
                     if (!requestFields.contains(sortParamRequest.getSortField())) {
                         errorList.add("sort support value only " +
                                 String.join(",", requestFields));
-                        errorSort = true;
-                    }
-
-                    if (errorSort && errorSortType) {
-                        break;
+                       break;
                     }
                 }
-            }
-
-
-            if (!CollectionUtils.isEmpty(errorList)) {
-                throw new ValidationException(errorList);
             }
         }
     }

@@ -1,5 +1,8 @@
 package com.atait.exercises.utils;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -11,7 +14,7 @@ import java.util.Date;
 public class DateUtils {
 
     public static final String DMY_PATTERN = "dd/MM/yyyy";
-
+    private static final Logger logger = LoggerFactory.getLogger(DateUtils.class);
 
     public static Date strtoDate(String pattern, String dateStr, DateParsingOption opt) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern(pattern);
@@ -24,7 +27,7 @@ public class DateUtils {
             };
             return Date.from(localDateTime.atZone(ZoneId.of("UTC")).toInstant());
         } catch (DateTimeParseException | NullPointerException | IllegalArgumentException e) {
-            //FIXME log warn
+            logger.warn("strToDate occurs error : {}",e);
         }
         return null;
     }

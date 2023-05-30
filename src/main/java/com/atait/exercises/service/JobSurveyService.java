@@ -63,6 +63,7 @@ public class JobSurveyService {
         searchingJobFieldMapping.put("company_name","companyName");
         searchingJobFieldMapping.put("gender","gender");
         searchingJobFieldMapping.put("created_date","created");
+        searchingJobFieldMapping.put("salary_currency","salaryCurrency");
     }
 
     public SearchJobSurveyResponse searchingJobDataResponse(SearchJobSurveyRequest request) {
@@ -83,7 +84,7 @@ public class JobSurveyService {
         Page<JobSurveyEntity> result = jobSurveyRepository.findAll(jobSurveySpecification.createJobSurveySpecification(specificationDTO), p);
 
         SearchJobSurveyResponse response = new SearchJobSurveyResponse();
-        response.setJobs(result.stream().map(dto -> JobSurveyDTOMapper.INSTANCE.dtoToJobResponse(dto, request.getFields())).collect(Collectors.toList()));
+        response.setJobs(result.stream().map(dto -> JobSurveyDTOMapper.INSTANCE.dtoToJobResponse(dto, request.getFields())).toList());
         response.setPage(result.getNumber() + 1);
         response.setPageSize(result.getNumberOfElements());
         response.setTotalItems(result.getTotalElements());
@@ -97,7 +98,6 @@ public class JobSurveyService {
             String salarySurveyFile = "setup/salary_survey-3.json";
             List<SalarySurvey> res = mapper.readValue(new File(salarySurveyFile), new TypeReference<>() {
             });
-            System.out.println(res);
 
             List<JobSurveyEntity> jobSurveyDTOS = new ArrayList<>();
             List<SalarySurvey> uncleanSurveyData = new ArrayList<>();

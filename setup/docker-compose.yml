@@ -12,9 +12,4 @@ services:
       - POSTGRES_DB=survey
     volumes:
       - ./db-script.sql:/docker-entrypoint-initdb.d/db-script.sql
-
-  redis:
-    image: "redis:5.0.5-alpine"
-    container_name: redis
-    ports:
-      - "6379:6379"
+      - ./pg-data:/var/lib/postgresql/data

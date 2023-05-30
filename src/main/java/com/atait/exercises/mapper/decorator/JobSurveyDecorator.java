@@ -11,6 +11,7 @@ import org.springframework.util.CollectionUtils;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 public abstract  class JobSurveyDecorator implements JobSurveyDTOMapper {
     private final JobSurveyDTOMapper mapper;
@@ -23,7 +24,9 @@ public abstract  class JobSurveyDecorator implements JobSurveyDTOMapper {
     public JobSurveyEntity sourceJsonToDTO(SalarySurvey survey){
         try {
             JobSurveyEntity dto = mapper.sourceJsonToDTO(survey);
-//FIXME do this?            dto.setSalaryCurrency("USD");
+            if(survey.getSalary().indexOf("$")  != -1 || survey.getSalary().toLowerCase().indexOf("usd")!= -1 || Objects.nonNull(dto.getSalary())){
+                dto.setSalaryCurrency("USD");
+            }
             return dto;
         }catch (Exception e){
             throw new SourceDataMapperException("Can't map surveyJsonToDTO , "+e);
@@ -53,6 +56,8 @@ public abstract  class JobSurveyDecorator implements JobSurveyDTOMapper {
           return jobResponse;
 
     }
+
+
 
 
 

@@ -23,8 +23,11 @@ public class JobResponse {
     private String location;
     private String companyName;
     private String gender;
+    private String salaryCurrency;
 
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     @JsonFormat(pattern = "dd/MM/yyyy")
     private LocalDateTime createdDate;
+
+
 }
