@@ -13,7 +13,6 @@ public class ObjectMapperConfiguration {
     public ObjectMapper setupObjectMapper(){
         ObjectMapper mapper= new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
         mapper.registerModule(new JavaTimeModule());
-//        mapper.configure(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE,false);
         return mapper;
     }
 }
