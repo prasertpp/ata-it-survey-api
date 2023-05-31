@@ -1,7 +1,6 @@
 package com.atait.exercises.model.request;
 
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.data.domain.Sort;

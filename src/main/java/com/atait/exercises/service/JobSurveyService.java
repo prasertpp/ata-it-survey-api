@@ -77,8 +77,8 @@ public class JobSurveyService {
 
         Pageable p = PageRequest.of(Math.max(request.getPage() - 1, DEFAULT_PAGE), Math.max(request.getPageSize(), DEFAULT_PAGE_SIZE), sort);
 
-        Date startDate = StringUtils.isEmpty(request.getStartDate())? null : DateUtils.strtoDate(DateUtils.DMY_PATTERN,request.getStartDate(), DateUtils.DateParsingOption.START_OF_DAY);
-        Date endDate = StringUtils.isEmpty(request.getEndDate())? null : DateUtils.strtoDate(DateUtils.DMY_PATTERN,request.getEndDate(), DateUtils.DateParsingOption.END_OF_DAY);
+        Date startDate = StringUtils.isEmpty(request.getStartDate())? null : DateUtils.strtoDate(DateUtils.DDMMYYYY_SLASH_PATTERN,request.getStartDate(), DateUtils.DateParsingOption.START_OF_DAY);
+        Date endDate = StringUtils.isEmpty(request.getEndDate())? null : DateUtils.strtoDate(DateUtils.DDMMYYYY_SLASH_PATTERN,request.getEndDate(), DateUtils.DateParsingOption.END_OF_DAY);
 
         JobSurveySpecificationDTO specificationDTO = new JobSurveySpecificationDTO(request.getSalaryConditions(), startDate,endDate,request.getJobTitle(),request.getGender());
         Page<JobSurveyEntity> result = jobSurveyRepository.findAll(jobSurveySpecification.createJobSurveySpecification(specificationDTO), p);
@@ -86,7 +86,7 @@ public class JobSurveyService {
         SearchJobSurveyResponse response = new SearchJobSurveyResponse();
         response.setJobs(result.stream().map(dto -> JobSurveyDTOMapper.INSTANCE.dtoToJobResponse(dto, request.getFields())).toList());
         response.setPage(result.getNumber() + 1);
-        response.setPageSize(result.getNumberOfElements());
+        response.setPageSize(result.getSize());
         response.setTotalItems(result.getTotalElements());
         response.setTotalPages(result.getTotalPages());
 

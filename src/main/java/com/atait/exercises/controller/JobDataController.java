@@ -93,8 +93,14 @@ public class JobDataController {
     }
 
     private List<SortParamRequest> getSortParamRequests(List<String> sortFields, List<String> sortTypes) {
+        boolean isSortFieldEmpty = CollectionUtils.isEmpty(sortFields);
+        boolean isSortTypeEmpty = CollectionUtils.isEmpty(sortTypes);
+        //NOTE: when no sorting set SortParamRequest to null
+        if( isSortFieldEmpty && isSortTypeEmpty){
+            return null;
+        }
         List<SortParamRequest> sortParamRequests = new ArrayList<>();
-        if (sortFields.size() != sortTypes.size()) {
+        if (isSortFieldEmpty || isSortTypeEmpty || sortFields.size() != sortTypes.size()) {
             throw new ValidationException("sort and sort_type are invalid format, the number of sort field and sort_type must match");
         }
         for (int i = 0; i < sortFields.size(); i++) {
@@ -158,11 +164,12 @@ public class JobDataController {
         if (!violations.isEmpty()) {
             List<String> constraintViolationErrors = violations.stream().map(ConstraintViolation::getMessage).toList();
             errorList.addAll(constraintViolationErrors);
+            throw new ValidationException(errorList);
         }
 
             validateFieldAndSorting(request, errorList);
 //         validate date
-            if(StringUtils.isNotBlank(request.getStartDate()) && StringUtils.isNotBlank(request.getEndDate()) && DateUtils.isBefore(DateUtils.DMY_PATTERN,request.getEndDate(),request.getStartDate())){
+            if(StringUtils.isNotBlank(request.getStartDate()) && StringUtils.isNotBlank(request.getEndDate()) && DateUtils.isBefore(DateUtils.DDMMYYYY_SLASH_PATTERN,request.getEndDate(),request.getStartDate())){
                 errorList.add("start_date is after end_date");
             }
 //         validate jobTitle

@@ -20,6 +20,9 @@
         <spring.stater.validation.version>3.1.0</spring.stater.validation.version>
         <lombok.mapstruct.binding.version>0.2.0</lombok.mapstruct.binding.version>
         <log4j.core.version>2.20.0</log4j.core.version>
+        <junit.jupiter.version>5.9.3</junit.jupiter.version>
+        <google.guava.version>31.0.1-jre</google.guava.version>
+        <assertj.core.version>3.24.2</assertj.core.version>
     </properties>
     <dependencies>
         <dependency>
@@ -65,7 +68,7 @@
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-            <version>31.0.1-jre</version>
+            <version>${google.guava.version}</version>
         </dependency>
 
 
@@ -82,12 +85,30 @@
             <version>${spring.stater.validation.version}</version>
         </dependency>
 
-
+<!--    TEST    -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
+
+        <!-- https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-engine -->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <version>${junit.jupiter.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/org.assertj/assertj-core -->
+        <dependency>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
+            <version>${assertj.core.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+
 
     </dependencies>
 
@@ -97,6 +118,9 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.11.0</version>
+                <configuration>
+                    <release>20</release> <!-- Specify the appropriate Java version -->
+                </configuration>
                 <executions>
                     <execution>
                         <id>default-compile</id>
@@ -142,7 +166,30 @@
                 </executions>
 
             </plugin>
+
+            <!-- JaCoCo Maven Plugin -->
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>0.8.10</version>
+                <executions>
+                    <execution>
+                        <id>prepare-agent</id>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>report</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
+
     </build>
 
 </project>

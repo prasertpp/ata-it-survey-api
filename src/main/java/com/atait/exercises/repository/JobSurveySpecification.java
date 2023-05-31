@@ -1,9 +1,8 @@
 package com.atait.exercises.repository;
 
-import com.atait.exercises.enums.OperatorEnum;
+import com.atait.exercises.model.dto.JobSurveySpecificationDTO;
 import com.atait.exercises.model.entity.JobSurveyEntity;
 import com.atait.exercises.model.request.SalaryCondition;
-import com.atait.exercises.model.dto.JobSurveySpecificationDTO;
 import io.micrometer.common.util.StringUtils;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.Path;
