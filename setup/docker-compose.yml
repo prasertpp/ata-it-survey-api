@@ -1,0 +1,15 @@
+version: "3"
+services:
+  postgres-ata-it-db:
+    image: "postgres:15-alpine"
+    container_name: postgres-ata-it-db
+    restart: 'always'
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=welcome
+      - POSTGRES_DB=survey
+    volumes:
+      - ./db-script.sql:/docker-entrypoint-initdb.d/db-script.sql
+      - ./pg-data:/var/lib/postgresql/data

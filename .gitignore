@@ -1,8 +1,15 @@
 # Compiled class file
 *.class
+*.idea/
+*.iml
 
 # Log file
-*.log
+*.logs
+logs/*
+setup/pg-data/*
+
+
+
 
 # BlueJ files
 *.ctxt
@@ -22,3 +29,5 @@
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
 replay_pid*
+
+target/*
