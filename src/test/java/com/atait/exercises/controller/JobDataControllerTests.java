@@ -268,7 +268,7 @@ public class JobDataControllerTests {
 
     @Test
     public void test_jobDataSearching_mapping_internalServerError() throws Exception {
-        when(jobSurveyService.searchingJobDataResponse(any())).thenThrow(new MapperErrorException("ca"));
+        when(jobSurveyService.searchingJobDataResponse(any())).thenThrow(new MapperErrorException("mapperError"));
 
         mockMvc.perform(
                 get("/api/v1/job_data")
@@ -276,7 +276,7 @@ public class JobDataControllerTests {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.status.code", is("INTERNAL_SERVER_ERROR")))
                 .andExpect(jsonPath("$.status.message", is("INTERNAL_SERVER_ERROR")))
-                .andExpect(jsonPath("$.status.errors").doesNotHaveJsonPath());
+                .andExpect(jsonPath("$.status.errors",containsInAnyOrder("mapperError")));
 
     }
 
