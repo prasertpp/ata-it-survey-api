@@ -84,11 +84,11 @@ public class JobDataController {
             @Parameter(description = "Page number")
             @RequestParam(value = "page", defaultValue = "1", required = false) Integer page,
 
-            @Parameter(description = "Field to display (allow values= job_id, job_title, salary, location, company_name, gender, salary_currency, created_date)")
+            @Parameter(description = "Field to display (allow values= job_id, job_title, salary, location, company_name, gender, salary_currency, survey_date)")
             @RequestParam(value = "field", required = false)
                     List<String> fields,
 
-            @Parameter(description = "Sort field name (allow values= job_id, job_title, salary, location, company_name, gender, salary_currency, created_date)")
+            @Parameter(description = "Sort field name (allow values= job_id, job_title, salary, location, company_name, gender, salary_currency, survey_date)")
             @RequestParam(value = "sort", required = false)
                     List<String> sorting,
 
