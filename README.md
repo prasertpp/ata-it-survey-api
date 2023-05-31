@@ -22,7 +22,7 @@ Before starting the application, make sure you have the following prerequisites 
 2. Use the following command to install sources files before running code
     
     ```shell
-     mvn install -DskipTests
+     ./mvnw install -DskipTests
     ```
 
 3. Use the following curl command to insert data into the API:
