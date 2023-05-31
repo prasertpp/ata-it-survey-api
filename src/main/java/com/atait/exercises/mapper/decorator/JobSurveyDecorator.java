@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.util.CollectionUtils;
 
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Objects;
 
@@ -30,7 +31,7 @@ public abstract  class JobSurveyDecorator implements JobSurveyDTOMapper {
             if(survey.getSalary().indexOf("$")  != -1 || survey.getSalary().toLowerCase().indexOf("usd")!= -1 || Objects.nonNull(dto.getSalary())){
                 dto.setSalaryCurrency("USD");
             }
-
+            dto.setCreated(Calendar.getInstance().getTime());
             return dto;
         }catch (Exception e){
             logger.error("[JobSurveyDecorator]::sourceJsonToDTO can't map surveyJsonToDTO : {}",e);

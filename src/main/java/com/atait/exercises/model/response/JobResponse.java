@@ -34,7 +34,7 @@ public class JobResponse {
 
     @JsonSerialize(using = CustomLocalDateTimeSerializer.class)
     @JsonDeserialize(using = CustomLocalDateTimeDeserializer.class)
-    private LocalDateTime createdDate;
+    private LocalDateTime surveyDate;
 
 
 }

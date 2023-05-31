@@ -25,6 +25,7 @@ import org.springframework.data.jpa.domain.Specification;
 import java.math.BigDecimal;
 import java.time.ZoneId;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Optional;
 
 import static com.atait.exercises.constant.CommonConstant.DEFAULT_PAGE;
@@ -71,8 +72,8 @@ class JobSurveyServiceTests {
         entity1.setAnnualStockValueBonus(new BigDecimal(3000));
         entity1.setGender("Male");
         entity1.setComments("");
-
-        entity1.setCreated(DateUtils.strtoDate(DateUtils.DDMMYYYY_SLASH_PATTERN, "12/02/2020", DateUtils.DateParsingOption.START_OF_DAY));
+        entity1.setSurveyDate(DateUtils.strtoDate(DateUtils.DDMMYYYY_SLASH_PATTERN, "12/02/2020", DateUtils.DateParsingOption.START_OF_DAY));
+        entity1.setCreated(Calendar.getInstance().getTime());
         var dbResult = Arrays.asList(entity1);
         //set result to page 1 with result 10
         Page<JobSurveyEntity> jobSurveyEntities = new PageImpl<>(dbResult, PageRequest.of(DEFAULT_PAGE, DEFAULT_PAGE_SIZE), dbResult.size());
@@ -98,8 +99,8 @@ class JobSurveyServiceTests {
         assertEquals(entity1.getCompanyName(), jobResponse.getCompanyName());
         assertEquals(entity1.getGender(), jobResponse.getGender());
         assertEquals(entity1.getSalaryCurrency(), jobResponse.getSalaryCurrency());
-        var dbDate = entity1.getCreated().toInstant().atZone(ZoneId.of("UTC")).toLocalDate().atStartOfDay();
-        assertTrue(dbDate.isEqual(jobResponse.getCreatedDate()));
+        var dbDate = entity1.getSurveyDate().toInstant().atZone(ZoneId.of("UTC")).toLocalDate().atStartOfDay();
+        assertTrue(dbDate.isEqual(jobResponse.getSurveyDate()));
 
     }
 
@@ -120,8 +121,9 @@ class JobSurveyServiceTests {
         entity1.setAnnualStockValueBonus(new BigDecimal(3000));
         entity1.setGender("Male");
         entity1.setComments("");
+        entity1.setSurveyDate(DateUtils.strtoDate(DateUtils.DDMMYYYY_SLASH_PATTERN, "12/02/2020", DateUtils.DateParsingOption.START_OF_DAY));
+        entity1.setCreated(Calendar.getInstance().getTime());
 
-        entity1.setCreated(DateUtils.strtoDate(DateUtils.DDMMYYYY_SLASH_PATTERN, "12/02/2020", DateUtils.DateParsingOption.START_OF_DAY));
         var dbResult = Arrays.asList(entity1);
         //set result to page 1 with result 10
         Page<JobSurveyEntity> jobSurveyEntities = new PageImpl<>(dbResult, PageRequest.of(DEFAULT_PAGE, DEFAULT_PAGE_SIZE), dbResult.size());
@@ -148,8 +150,8 @@ class JobSurveyServiceTests {
         assertEquals(entity1.getCompanyName(), jobResponse.getCompanyName());
         assertEquals(entity1.getGender(), jobResponse.getGender());
         assertEquals(entity1.getSalaryCurrency(), jobResponse.getSalaryCurrency());
-        var dbDate = entity1.getCreated().toInstant().atZone(ZoneId.of("UTC")).toLocalDate().atStartOfDay();
-        assertTrue(dbDate.isEqual(jobResponse.getCreatedDate()));
+        var dbDate = entity1.getSurveyDate().toInstant().atZone(ZoneId.of("UTC")).toLocalDate().atStartOfDay();
+        assertTrue(dbDate.isEqual(jobResponse.getSurveyDate()));
     }
 
 }

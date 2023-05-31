@@ -54,7 +54,7 @@ public class JobSurveyService {
     @PostConstruct
     public void cacheMapping(){
         //NOTE: To solve problem when request send response fieldName is not related to Dto fieldName
-        // e.g. created_date (in JobResponse.class), created (in JobSurveyDTo.class)
+        // e.g. survey_date  (in JobResponse.class snake case), created (in JobSurveyEntity.class)
         searchingJobFieldMapping = new HashMap<>();
         searchingJobFieldMapping.put("job_id","jobId");
         searchingJobFieldMapping.put("job_title","jobTitle");
@@ -62,7 +62,7 @@ public class JobSurveyService {
         searchingJobFieldMapping.put("location","location");
         searchingJobFieldMapping.put("company_name","companyName");
         searchingJobFieldMapping.put("gender","gender");
-        searchingJobFieldMapping.put("created_date","created");
+        searchingJobFieldMapping.put("survey_date","surveyDate");
         searchingJobFieldMapping.put("salary_currency","salaryCurrency");
     }
 

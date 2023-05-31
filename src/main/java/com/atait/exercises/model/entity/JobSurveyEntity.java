@@ -44,6 +44,8 @@ public class JobSurveyEntity {
     private String gender;
     @Column(name = "comments")
     private String comments;
+    @Column(name = "survey_date")
+    private Date surveyDate;
     @Column(name = "created")
     private Date created;
 }

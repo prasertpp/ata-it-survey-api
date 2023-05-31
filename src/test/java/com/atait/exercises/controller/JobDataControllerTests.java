@@ -77,7 +77,7 @@ public class JobDataControllerTests {
                 .andExpect(jsonPath("$.data.jobs[0].company_name", is("Discover")))
                 .andExpect(jsonPath("$.data.jobs[0].gender", is("Male")))
                 .andExpect(jsonPath("$.data.jobs[0].salary_currency", is("USD")))
-                .andExpect(jsonPath("$.data.jobs[0].created_date", is("11/02/2020")));
+                .andExpect(jsonPath("$.data.jobs[0].survey_date", is("11/02/2020")));
     }
 
     @Test
@@ -104,7 +104,7 @@ public class JobDataControllerTests {
                         .queryParam("gender", "male")
                         .queryParam("page", "1")
                         .queryParam("page_size", "10")
-                        .queryParam("field", "job_id," + "job_title," + "salary," + "location," + "company_name," + "gender," + "salary_currency," + "created_date")
+                        .queryParam("field", "job_id," + "job_title," + "salary," + "location," + "company_name," + "gender," + "salary_currency," + "survey_date")
                         .queryParam("sort", "job_id")
                         .queryParam("sort_type", "desc")
                         .queryParam("salary[gte]", "2000")
@@ -124,7 +124,7 @@ public class JobDataControllerTests {
                 .andExpect(jsonPath("$.data.jobs[0].company_name", is("Discover")))
                 .andExpect(jsonPath("$.data.jobs[0].gender", is("Male")))
                 .andExpect(jsonPath("$.data.jobs[0].salary_currency", is("USD")))
-                .andExpect(jsonPath("$.data.jobs[0].created_date", is("11/02/2020")));
+                .andExpect(jsonPath("$.data.jobs[0].survey_date", is("11/02/2020")));
     }
 
     @Test
@@ -188,7 +188,7 @@ public class JobDataControllerTests {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.status.code", is("BAD_REQUEST")))
                 .andExpect(jsonPath("$.status.message", is("invalid parameter")))
-                .andExpect(jsonPath("$.status.errors[0]", is("field support value only job_id,job_title,salary,location,company_name,gender,salary_currency,created_date")));
+                .andExpect(jsonPath("$.status.errors[0]", is("field support value only job_id,job_title,salary,location,company_name,gender,salary_currency,survey_date")));
     }
 
     @Test
@@ -201,7 +201,7 @@ public class JobDataControllerTests {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.status.code", is("BAD_REQUEST")))
                 .andExpect(jsonPath("$.status.message", is("invalid parameter")))
-                .andExpect(jsonPath("$.status.errors[0]", is("sort support value only job_id,job_title,salary,location,company_name,gender,salary_currency,created_date")));
+                .andExpect(jsonPath("$.status.errors[0]", is("sort support value only job_id,job_title,salary,location,company_name,gender,salary_currency,survey_date")));
     }
 
 

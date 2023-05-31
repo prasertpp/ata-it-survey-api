@@ -12,6 +12,7 @@ annual_bonus numeric,
 annual_stock_value_bonus varchar,
 gender varchar NOT NULL,
 comments varchar,
+survey_date TIMESTAMP NOT NULL,
 created TIMESTAMP NOT NULL,
 CONSTRAINT job_survey_pk PRIMARY KEY (id)
 

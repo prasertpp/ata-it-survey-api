@@ -28,13 +28,13 @@ public class JobSurveySpecification {
             }
 
             if(Objects.nonNull(spec.startDate())){
-                Predicate startDatePredicate = builder.greaterThanOrEqualTo(root.get("created"),spec.startDate());
+                Predicate startDatePredicate = builder.greaterThanOrEqualTo(root.get("surveyDate"),spec.startDate());
                 predicate = Objects.isNull(predicate) ? startDatePredicate: builder.and(predicate,startDatePredicate);
             }
 
 
             if(Objects.nonNull(spec.endDate())){
-                Predicate endDatePredicate = builder.lessThanOrEqualTo(root.get("created"),spec.endDate());
+                Predicate endDatePredicate = builder.lessThanOrEqualTo(root.get("surveyDate"),spec.endDate());
                 predicate = Objects.isNull(predicate) ? endDatePredicate: builder.and(predicate,endDatePredicate);
             }
 
