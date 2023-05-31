@@ -15,6 +15,7 @@ import com.atait.exercises.utils.DateUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.CaseFormat;
 import io.micrometer.common.util.StringUtils;
+import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
@@ -67,23 +68,42 @@ public class JobDataController {
     @GetMapping(value = "/job_data", produces = "application/json")
     public ResponseEntity<CommonResponse<SearchJobSurveyResponse>> jobDataSearching(
             HttpServletRequest servletRequest,
-            @RequestParam(value = "start_date",required = false) String startDate,
-            @RequestParam(value = "end_date",required = false) String endDate,
-            @RequestParam(value = "job_title",required = false) String jobTitle,
-            @RequestParam(value = "gender",required = false) String gender,
+            @Parameter(description = "Start date in dd/MM/yyyy format")
+            @RequestParam(value = "start_date", required = false) String startDate,
+
+            @Parameter(description = "End date in dd/MM/yyyy format")
+            @RequestParam(value = "end_date", required = false) String endDate,
+
+            @Parameter(description = "Job title (case insensitive)")
+            @RequestParam(value = "job_title", required = false) String jobTitle,
+
+            @Parameter(description = "Gender (case insensitive)")
+            @RequestParam(value = "gender", required = false) String gender,
+
+            @Parameter(description = "Page size (maximum 1000 items)")
             @RequestParam(value = "page_size", defaultValue = "10", required = false) Integer pageSize,
+
+            @Parameter(description = "Page number")
             @RequestParam(value = "page", defaultValue = "1", required = false) Integer page,
+
+            @Parameter(description = "Field to display (allow values= job_id, job_title, salary, location, company_name, gender, salary_currency, created_date)")
             @RequestParam(value = "field", required = false)
-            @Value("#{'${field}'.split(',')}") List<String> fields,
-            @RequestParam(value = "sort", required = false) List<String> sorting,
-            @RequestParam(value = "sort_type", required = false) List<String> sortTypes
+                    List<String> fields,
+
+            @Parameter(description = "Sort field name (allow values= job_id, job_title, salary, location, company_name, gender, salary_currency, created_date)")
+            @RequestParam(value = "sort", required = false)
+                    List<String> sorting,
+
+            @Parameter(description = "Sort type ('asc' or 'desc')")
+            @RequestParam(value = "sort_type", required = false)
+                    List<String> sortTypes
     ) {
         logger.info("[jobDataSearching] START");
         List<SalaryCondition> salaryConditions = getSalaryConditions(servletRequest);
         List<SortParamRequest> sortParamRequests = getSortParamRequests(sorting, sortTypes);
 
-        SearchJobSurveyRequest request = new SearchJobSurveyRequest(salaryConditions,startDate,endDate,jobTitle,gender, fields, page, pageSize, sortParamRequests);
-        logger.info("[jobDataSearching] REQUEST : {}",request);
+        SearchJobSurveyRequest request = new SearchJobSurveyRequest(salaryConditions, startDate, endDate, jobTitle, gender, fields, page, pageSize, sortParamRequests);
+        logger.info("[jobDataSearching] REQUEST : {}", request);
         validateJobDataSearchingValue(request);
         CommonResponse<SearchJobSurveyResponse> response = new CommonResponse<>();
         response.setStatus(new Status(StatusCode.SUCCESS, "success"));
@@ -97,7 +117,7 @@ public class JobDataController {
         boolean isSortFieldEmpty = CollectionUtils.isEmpty(sortFields);
         boolean isSortTypeEmpty = CollectionUtils.isEmpty(sortTypes);
         //NOTE: when no sorting set SortParamRequest to null
-        if( isSortFieldEmpty && isSortTypeEmpty){
+        if (isSortFieldEmpty && isSortTypeEmpty) {
             return null;
         }
         List<SortParamRequest> sortParamRequests = new ArrayList<>();
@@ -113,7 +133,7 @@ public class JobDataController {
     }
 
     private List<SalaryCondition> getSalaryConditions(HttpServletRequest servletRequest) {
-        Map<String,String[]> allQueryParams = servletRequest.getParameterMap();
+        Map<String, String[]> allQueryParams = servletRequest.getParameterMap();
         List<SalaryCondition> salaryConditions = new ArrayList<>();
         List<String> errorList = new ArrayList<>();
         Set<String> operatorsSet = new HashSet<>();
@@ -125,8 +145,8 @@ public class JobDataController {
                 if (!operatorsSet.contains(operator)) {
                     try {
                         Optional<OperatorEnum> operatorEnum = OperatorEnum.of(operator);
-                        if(operatorEnum.isEmpty()){
-                            errorList.add("["+operator+ "] is invalid value, operators supports only [gt],[lt],[eq],[gte],[lte]");
+                        if (operatorEnum.isEmpty()) {
+                            errorList.add("[" + operator + "] is invalid value, operators supports only [gt],[lt],[eq],[gte],[lte]");
                             break;
                         }
                         SalaryCondition salaryCondition = new SalaryCondition(new BigDecimal(entry.getValue()[0]), operatorEnum.get());
@@ -167,15 +187,15 @@ public class JobDataController {
             throw new ValidationException(errorList);
         }
 
-            validateFieldAndSorting(request, errorList);
+        validateFieldAndSorting(request, errorList);
 //         validate date
-            if(StringUtils.isNotBlank(request.getStartDate()) && StringUtils.isNotBlank(request.getEndDate()) && DateUtils.isBefore(DateUtils.DDMMYYYY_SLASH_PATTERN,request.getEndDate(),request.getStartDate())){
-                errorList.add("start_date is after end_date");
-            }
+        if (StringUtils.isNotBlank(request.getStartDate()) && StringUtils.isNotBlank(request.getEndDate()) && DateUtils.isBefore(DateUtils.DDMMYYYY_SLASH_PATTERN, request.getEndDate(), request.getStartDate())) {
+            errorList.add("start_date is after end_date");
+        }
 //         validate jobTitle
-            if (!CollectionUtils.isEmpty(errorList)) {
-                throw new ValidationException(errorList);
-            }
+        if (!CollectionUtils.isEmpty(errorList)) {
+            throw new ValidationException(errorList);
+        }
     }
 
     private void validateFieldAndSorting(SearchJobSurveyRequest request, List<String> errorList) {
@@ -204,7 +224,7 @@ public class JobDataController {
                     if (!requestFields.contains(sortParamRequest.getSortField())) {
                         errorList.add("sort support value only " +
                                 String.join(",", requestFields));
-                       break;
+                        break;
                     }
                 }
             }
