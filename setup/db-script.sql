@@ -5,7 +5,7 @@ location varchar,
 job_title varchar NOT NULL,
 year_at_employer numeric,
 total_year_experience numeric,
-salary numeric NOT NULL,
+salary numeric NOT NULL CHECK (salary >= 0),
 salary_currency varchar,
 signing_bonus numeric,
 annual_bonus numeric,
@@ -14,6 +14,7 @@ gender varchar NOT NULL,
 comments varchar,
 created TIMESTAMP NOT NULL,
 CONSTRAINT job_survey_pk PRIMARY KEY (id)
+
 );
 
 CREATE INDEX job_survey_job_title_idx ON public.job_survey (job_title);

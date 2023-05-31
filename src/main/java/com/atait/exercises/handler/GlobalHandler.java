@@ -1,10 +1,10 @@
 package com.atait.exercises.handler;
 
 import com.atait.exercises.enums.StatusCode;
+import com.atait.exercises.exception.MapperErrorException;
 import com.atait.exercises.exception.ValidationException;
 import com.atait.exercises.model.response.CommonResponse;
 import com.atait.exercises.model.response.Status;
-import jakarta.validation.ConstraintViolationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @ControllerAdvice
 public class GlobalHandler {
@@ -26,12 +25,21 @@ public class GlobalHandler {
     public ResponseEntity<CommonResponse> handlerException(Exception e) {
         logger.error("INTERNAL SERVER ERROR : {}", e);
         CommonResponse response = new CommonResponse();
-        Status status = new Status(StatusCode.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR.toString());
+        Status status = new Status(StatusCode.INTERNAL_SERVER_ERROR, StatusCode.INTERNAL_SERVER_ERROR.toString());
         response.setStatus(status);
 
         return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
+    @ExceptionHandler({MapperErrorException.class})
+    public ResponseEntity<CommonResponse> handlerMapperException(MapperErrorException e) {
+        logger.error("MAPPER ERROR exception : {}", e);
+        CommonResponse response = new CommonResponse();
+        Status status = new Status(StatusCode.INTERNAL_SERVER_ERROR, StatusCode.INTERNAL_SERVER_ERROR.toString(),Arrays.asList(e.getMessage()));
+        response.setStatus(status);
+
+        return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
 
 
     @ExceptionHandler(ValidationException.class)

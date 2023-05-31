@@ -1,5 +1,6 @@
 package com.atait.exercises.controller;
 
+import com.atait.exercises.exception.MapperErrorException;
 import com.atait.exercises.model.response.JobResponse;
 import com.atait.exercises.model.response.SearchJobSurveyResponse;
 import com.atait.exercises.service.JobSurveyService;
@@ -249,6 +250,34 @@ public class JobDataControllerTests {
                 .andExpect(jsonPath("$.status.code", is("BAD_REQUEST")))
                 .andExpect(jsonPath("$.status.message", is("invalid parameter")))
                 .andExpect(jsonPath("$.status.errors[0]", is("start_date is after end_date")));
+    }
+
+    @Test
+    public void test_jobDataSearching_unknown_internalServerError() throws Exception {
+        when(jobSurveyService.searchingJobDataResponse(any())).thenThrow(new RuntimeException("other Exception"));
+
+        mockMvc.perform(
+                get("/api/v1/job_data")
+        ).andExpect(status().isInternalServerError())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.status.code", is("INTERNAL_SERVER_ERROR")))
+                .andExpect(jsonPath("$.status.message", is("INTERNAL_SERVER_ERROR")))
+                .andExpect(jsonPath("$.status.errors").doesNotHaveJsonPath());
+
+    }
+
+    @Test
+    public void test_jobDataSearching_mapping_internalServerError() throws Exception {
+        when(jobSurveyService.searchingJobDataResponse(any())).thenThrow(new MapperErrorException("ca"));
+
+        mockMvc.perform(
+                get("/api/v1/job_data")
+        ).andExpect(status().isInternalServerError())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.status.code", is("INTERNAL_SERVER_ERROR")))
+                .andExpect(jsonPath("$.status.message", is("INTERNAL_SERVER_ERROR")))
+                .andExpect(jsonPath("$.status.errors").doesNotHaveJsonPath());
+
     }
 
 

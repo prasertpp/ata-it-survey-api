@@ -13,6 +13,7 @@ import java.util.List;
 public class SearchJobSurveyRequest {
 
 //    search conditions
+    @Valid
     private List<SalaryCondition> salaryConditions;
 
     @Pattern(regexp = "^([0-2][0-9]||3[0-1])/(0[0-9]||1[0-2])/([0-9][0-9])?[0-9][0-9]$", message = "start_date is invalid format, format is dd/MM/yyyy")

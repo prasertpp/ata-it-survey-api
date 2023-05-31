@@ -57,7 +57,6 @@ class JobSurveyServiceTests {
 
     @Test
     void test_searchingJobDataResponse_success() {
-
         JobSurveyEntity entity1 = new JobSurveyEntity();
         entity1.setJobId(2724L);
         entity1.setCompanyName("Discover");
@@ -151,7 +150,6 @@ class JobSurveyServiceTests {
         assertEquals(entity1.getSalaryCurrency(), jobResponse.getSalaryCurrency());
         var dbDate = entity1.getCreated().toInstant().atZone(ZoneId.of("UTC")).toLocalDate().atStartOfDay();
         assertTrue(dbDate.isEqual(jobResponse.getCreatedDate()));
-
     }
 
 }

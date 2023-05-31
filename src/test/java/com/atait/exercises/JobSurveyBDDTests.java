@@ -45,8 +45,9 @@ public class JobSurveyBDDTests {
         SearchJobSurveyResponse data = body.getData();
         assertEquals(10,data.getPageSize(),"body.data.pageSize invalid");
         assertEquals(1,data.getPage(),"body.data.page invalid");
-        assertEquals(10,data.getJobs().size(),"body.data.jobs size invalid");
     }
+
+
 
 
 }

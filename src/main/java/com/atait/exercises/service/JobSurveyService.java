@@ -1,12 +1,12 @@
 package com.atait.exercises.service;
 
-import com.atait.exercises.exception.SourceDataMapperException;
+import com.atait.exercises.exception.MapperErrorException;
 import com.atait.exercises.mapper.JobSurveyDTOMapper;
+import com.atait.exercises.model.dto.JobSurveySpecificationDTO;
 import com.atait.exercises.model.entity.JobSurveyEntity;
 import com.atait.exercises.model.request.SearchJobSurveyRequest;
 import com.atait.exercises.model.response.SearchJobSurveyResponse;
 import com.atait.exercises.model.source.SalarySurvey;
-import com.atait.exercises.model.dto.JobSurveySpecificationDTO;
 import com.atait.exercises.repository.JobSurveyRepository;
 import com.atait.exercises.repository.JobSurveySpecification;
 import com.atait.exercises.utils.DateUtils;
@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import java.io.File;
+import java.math.BigDecimal;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -31,7 +32,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import static com.atait.exercises.constant.CommonConstant.DEFAULT_PAGE;
 import static com.atait.exercises.constant.CommonConstant.DEFAULT_PAGE_SIZE;
@@ -71,7 +71,7 @@ public class JobSurveyService {
                 Arrays.asList(new Sort.Order(Sort.Direction.DESC,searchingJobFieldMapping.get("job_id")))
                 :request.getSortParamRequests().stream()
                 .map(s -> new Sort.Order(s.getSortType().get(), searchingJobFieldMapping.get(s.getSortField())))
-                .collect(Collectors.toList());
+               .toList();
 
         Sort sort = Sort.by(orders);
 
@@ -105,8 +105,11 @@ public class JobSurveyService {
                 SalarySurvey salarySurvey = res.get(i);
                 try {
                     JobSurveyEntity dto = JobSurveyDTOMapper.INSTANCE.sourceJsonToDTO(salarySurvey);
-                    jobSurveyDTOS.add(dto);
-                } catch (SourceDataMapperException e) {
+                    //condition to save db
+                    if(dto.getSalary().compareTo(new BigDecimal("100")) != -1) {
+                        jobSurveyDTOS.add(dto);
+                    }
+                } catch (MapperErrorException e) {
                     uncleanSurveyData.add(salarySurvey);
                     continue;
                 }

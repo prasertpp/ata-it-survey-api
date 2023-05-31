@@ -32,6 +32,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -45,7 +46,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 
-@Controller
+@RestController
 @RequestMapping("/api/v1")
 @Validated
 public class JobDataController {
@@ -156,7 +157,6 @@ public class JobDataController {
 
 
     public void validateJobDataSearchingValue(SearchJobSurveyRequest request) {
-
 //        validate spring constraint
         Set<ConstraintViolation<SearchJobSurveyRequest>> violations = validator.validate(request);
 
@@ -173,12 +173,9 @@ public class JobDataController {
                 errorList.add("start_date is after end_date");
             }
 //         validate jobTitle
-
-
             if (!CollectionUtils.isEmpty(errorList)) {
                 throw new ValidationException(errorList);
             }
-
     }
 
     private void validateFieldAndSorting(SearchJobSurveyRequest request, List<String> errorList) {

@@ -1,12 +1,13 @@
 package com.atait.exercises.mapper.decorator;
 
-import com.atait.exercises.exception.IllegalDisplayFieldNameException;
-import com.atait.exercises.exception.SourceDataMapperException;
+import com.atait.exercises.exception.MapperErrorException;
 import com.atait.exercises.mapper.JobSurveyDTOMapper;
 import com.atait.exercises.model.entity.JobSurveyEntity;
 import com.atait.exercises.model.response.JobResponse;
 import com.atait.exercises.model.source.SalarySurvey;
 import com.google.common.base.CaseFormat;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.util.CollectionUtils;
 
 import java.util.Arrays;
@@ -15,6 +16,8 @@ import java.util.Objects;
 
 public abstract  class JobSurveyDecorator implements JobSurveyDTOMapper {
     private final JobSurveyDTOMapper mapper;
+
+    final Logger logger = LoggerFactory.getLogger(JobSurveyDecorator.class);
 
     public JobSurveyDecorator(JobSurveyDTOMapper mapper){
         this.mapper = mapper;
@@ -27,9 +30,13 @@ public abstract  class JobSurveyDecorator implements JobSurveyDTOMapper {
             if(survey.getSalary().indexOf("$")  != -1 || survey.getSalary().toLowerCase().indexOf("usd")!= -1 || Objects.nonNull(dto.getSalary())){
                 dto.setSalaryCurrency("USD");
             }
+
             return dto;
         }catch (Exception e){
-            throw new SourceDataMapperException("Can't map surveyJsonToDTO , "+e);
+            logger.error("[JobSurveyDecorator]::sourceJsonToDTO can't map surveyJsonToDTO : {}",e);
+
+
+            throw new MapperErrorException("Failed to map sourceJsonToDTO");
         }
 
     }
@@ -48,8 +55,9 @@ public abstract  class JobSurveyDecorator implements JobSurveyDTOMapper {
                         field.setAccessible(true);
                         try {
                             field.set(jobResponse, null);
-                        } catch (IllegalAccessException e) {
-                            throw new IllegalDisplayFieldNameException("Cannot set Field in Response" + e);
+                        } catch (IllegalAccessException | IllegalArgumentException e) {
+                            logger.error("[JobSurveyDecorator]::dtoToJobResponse failed to set visibility on field :{}",e);
+                            throw new MapperErrorException("Failed to map dtoToJobResponse");
                         }
                     });
         }
